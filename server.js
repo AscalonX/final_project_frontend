@@ -5,7 +5,7 @@ const connectDB = require('./config/db');
 const path = require('path');
 const cors = require('cors');
 
-dotenv.config({path:'./config/config.env'});
+dotenv.config({path: path.join(__dirname, 'config/config.env')});
 const auth = require('./routes/auth');
 
 connectDB();
@@ -31,10 +31,14 @@ app.use('/api/v1/auth', auth);
 app.use('/api/v1/recommend', recommend);
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, ' mode on port ', PORT));
 
-process.on('unhandledRejection', (err, promise) => {
-    console.log(`Error: ${err.message}`);
-    server.close(() => process.exit(1));
-});
+if (require.main === module) {
+    const server = app.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, ' mode on port ', PORT));
+    process.on('unhandledRejection', (err, promise) => {
+        console.log(`Error: ${err.message}`);
+        server.close(() => process.exit(1));
+    });
+}
+
+module.exports = app;
 
